@@ -147,11 +147,11 @@ class Tests {
 		Message message = new Message(testString, 0, 0);
 
 		System.out.println("Message:\n" + message.toString());
-		System.out.println("\nChecksum (applied on ',0:0;\\n<message content>':\n" + message.getChecksum());
+		System.out.println("\nChecksum (applied on ',0:0;<extra>\\n<message content>':\n" + message.getChecksum());
 
 		// verify the checksum
 		CRC32 crc = new CRC32();
-		String s = "," + message.getAckSeq() + "\n" + message.getContent();
+		String s = "," + message.getAckSeq() + message.getExtra() + "\n" + message.getContent();
 		crc.update(s.getBytes(Message.charset));
 		assertEquals(message.getChecksum(), crc.getValue());
 	}
@@ -270,6 +270,8 @@ class Tests {
 	@Test
 	void test15_16() throws IOException {
 		System.out.println("><><><><Test 15 & 16><><><><\n");
+		
+		System.out.println("An exception will be thrown when attempting to send a package larger than the specified limit.");
 		
 	    byte[] array = new byte[577];
 	    new Random().nextBytes(array);

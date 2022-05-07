@@ -1,7 +1,13 @@
 package main;
 
 import java.nio.charset.Charset;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.zip.CRC32;
@@ -13,6 +19,8 @@ public class Message {
 	private int seqNumber = 0;
 
 	private String extra = "";
+	
+	private ArrayList<String> cache = null;
 	private String content;
 	public final static Charset charset = Charset.availableCharsets().get("UTF-8");
 	public final static int packetSize = 576;
@@ -23,6 +31,7 @@ public class Message {
 
 		String message = "," + ack + ":" + seq + ";\n" + content;
 		byte[] bytes = message.getBytes(charset);
+		
 
 		// comma
 		if (bytes.length + 1 < packetSize - 5) {
@@ -35,6 +44,8 @@ public class Message {
 		} else {
 			throw new IllegalArgumentException("Message is too long");
 		}
+		
+		this.cache = new ArrayList<String>();
 	}
 
 	public Message(byte[] bytes) throws IllegalArgumentException {
@@ -73,7 +84,26 @@ public class Message {
 
 		Scanner scanner = new Scanner(message);
 		// ?
-		this.extra = scanner.nextLine().substring(end2 + 1);
+		String extra = scanner.nextLine().substring(end2 + 1);
+		
+		
+		if (extra.indexOf("CA:") != -1) {
+			String cacheBuf = extra.substring(extra.indexOf("CA:") + 3);
+			cacheBuf = cacheBuf.substring(0, cacheBuf.indexOf(";"));
+			
+			this.cache = new ArrayList<String>();
+			this.cache.addAll(Arrays.asList(cacheBuf.split(",")));
+			
+			if (!(extra.length() == extra.indexOf(";") + 1)) {
+			this.extra = extra.substring(extra.indexOf(";" + 1));
+			} else {
+				this.extra = "";
+			}
+			
+		} else {
+			this.extra = extra;
+		}
+		
 		this.content = "";
 
 		while (scanner.hasNextLine()) {
@@ -110,8 +140,8 @@ public class Message {
 		return this.checksum.getValue();
 	}
 
-	public String getExtra() {
-		return extra;
+	public String getExtra() {	
+		return this.getCache() + this.extra;
 	}
 
 	public void setExtra(String extra) {
@@ -153,6 +183,53 @@ public class Message {
 	@Override
 	public String toString() {
 		return new String(this.encode(), charset);
+	}
+	
+	public void addCache(Menu menu) {
+		
+		LocalDate today = LocalDate.now();
+		DayOfWeek dayOfWeek = today.getDayOfWeek();
+		String day = menu.getDay().toLowerCase();
+		
+		if (day.equals(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).toString().toLowerCase())) {
+			this.cache.add("today");
+		}
+		
+		this.cache.add(day);
+		this.cache.add(menu.getTheme().toLowerCase());
+		
+		
+	}
+	
+	public String getCache() {
+		String output = "";
+		
+		if (!Objects.isNull(this.cache) &&!this.cache.isEmpty()) {
+			output += "CA:";
+			
+			for (String cache : this.cache) {
+				output += cache + ",";
+			}
+			
+			output = output.substring(0, output.length() - 1);
+			output += ";";
+		}
+		
+		return output;
+	}
+	
+	public HashMap<String, String> getCacheMap() {
+		HashMap<String, String> map = null;
+		
+		if (!Objects.isNull(this.cache) &&!this.cache.isEmpty()) {
+			map = new HashMap<String, String>();
+			
+			for (String str : this.cache) {
+				map.put(str, this.getContent());
+			}
+		}
+		
+		return map;
 	}
 
 }

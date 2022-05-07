@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -14,6 +16,8 @@ public class Client implements Runnable {
 	private DatagramSocket ds = null;
 	private int seqNumber = 0;
 	private int ackNumber = 0;
+
+	private HashMap<String, String> cache = null;
 
 	public Client() {
 		super();
@@ -29,6 +33,8 @@ public class Client implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		this.cache = new HashMap<String, String>();
 	}
 
 	@SuppressWarnings("resource")
@@ -58,15 +64,15 @@ public class Client implements Runnable {
 		Message response = this.sendAndReceive(message);
 		/////////////////////////////
 		System.out.println("\nClient sending:\n" + new Message(message, a, s).toString());
-		
+
 		if (Objects.isNull(response)) {
 			return null;
 		}
 		System.out.println("\nClient receiving:\n" + response.toString());
 		return response.getContent();
-		
+
 	}
-	
+
 	public String test(String message, String extra) throws IOException {
 		int a = this.ackNumber;
 		int s = this.seqNumber;
@@ -75,13 +81,13 @@ public class Client implements Runnable {
 		Message test = new Message(message, a, s);
 		test.setExtra(extra);
 		System.out.println("\nClient sending:\n" + test.toString());
-		
+
 		if (Objects.isNull(response)) {
 			return null;
 		}
 		System.out.println("\nClient receiving:\n" + response.toString());
 		return response.getContent();
-		
+
 	}
 
 	public Message sendAndReceive(String input) throws IOException {
@@ -89,6 +95,14 @@ public class Client implements Runnable {
 		Message messageR = null;
 		byte[] buffer = null;
 		DatagramPacket packetR = null;
+
+		if (!this.cache.isEmpty()) {
+			for (Entry<String, String> entry : this.cache.entrySet()) {
+				if (input.contains(entry.getKey())) {
+					return new Message(entry.getValue() + "\n*Cache Hit*", 0, 0);
+				}
+			}
+		}
 
 		int i = 0;
 		this.send(messageS);
@@ -119,12 +133,16 @@ public class Client implements Runnable {
 			System.out.println(e.getLocalizedMessage());
 			return null;
 		}
-		
+
 		this.ackNumber = messageR.getSeqNumber();
+		
+		if (!Objects.isNull(messageR.getCacheMap())) {
+			this.cache.putAll(messageR.getCacheMap());
+		}
 		return messageR;
 
 	}
-	
+
 	public Message sendAndReceive(String input, String extra) throws IOException {
 		Message messageS = new Message(input, this.ackNumber, this.seqNumber);
 		messageS.setExtra(extra);
@@ -160,14 +178,19 @@ public class Client implements Runnable {
 		} catch (Exception e) {
 			return null;
 		}
-		
+
 		this.ackNumber = messageR.getSeqNumber();
+
+		if (!Objects.isNull(messageR.getCacheMap())) {
+			this.cache.putAll(messageR.getCacheMap());
+		}
+
 		return messageR;
 
 	}
-	
+
 	public Message testReceive(int timeout) {
-		
+
 		byte[] buffer = new byte[65535];
 		DatagramPacket packetR = null;
 		Message message = null;
@@ -178,7 +201,6 @@ public class Client implements Runnable {
 			e1.printStackTrace();
 		}
 
-		
 		packetR = new DatagramPacket(buffer, buffer.length);
 
 		try {
@@ -194,14 +216,18 @@ public class Client implements Runnable {
 			System.out.println(e);
 			return null;
 		}
-		
+
 		/////////////////////////////
 		System.out.println("\nClient receiving:\n" + new String(message.toString()));
-		
+
 		this.ackNumber = message.getSeqNumber();
+		
+		if (!Objects.isNull(message.getCacheMap())) {
+			this.cache.putAll(message.getCacheMap());
+		}
+		
 		return message;
 	}
-	
 
 	public void send(Message message) throws IOException {
 		InetAddress ip = InetAddress.getLocalHost();
@@ -217,7 +243,7 @@ public class Client implements Runnable {
 		}
 		this.seqNumber = this.seqNumber + 1;
 	}
-	
+
 	public void testSend(String string) {
 		int a = this.ackNumber;
 		int s = this.seqNumber;
@@ -239,7 +265,7 @@ public class Client implements Runnable {
 	public void close() {
 		ds.close();
 	}
-	
+
 	public SocketAddress getAddress() {
 		return this.ds.getLocalSocketAddress();
 	}

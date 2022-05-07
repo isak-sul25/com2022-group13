@@ -22,6 +22,8 @@ public class CServer {
 		Server s = new Server(menuList);
 		//1
 		System.out.println("Server port: " + Server.port + "\n");
+		
+		s.run();
 	}
 
 }

@@ -85,14 +85,10 @@ public class RunServer {
 	    
 		Client client = new Client();
 	    Thread thread2 = new Thread(client);
-	    thread2.start();
-	    
-	    client.test("Hi 1");
-	    client.test("Hi 1");
-	    client.test("Hi 1");
-	    client.test("Hi 1");
-		
-		//Message mes = new Message("Hello World!", 0, 0);
+	    //thread2.start();	
+		client.test("american");
+		client.test("american");
+	    //Message mes = new Message("Hello World!", 0, 0);
 		//System.out.println(mes.toString());
 		
 		//Message mes2 = new Message(mes.encode());

@@ -66,7 +66,6 @@ public class Server implements Runnable {
 			// System.out.println(e);
 			return;
 		}
-		
 
 		try {
 			messageR = new Message(buffer);
@@ -74,6 +73,9 @@ public class Server implements Runnable {
 			System.out.println(e);
 			return;
 		}
+		
+		/////
+		//System.out.println(messageR.toString());
 	
 		this.ackNumber = messageR.getSeqNumber();
 
@@ -162,15 +164,16 @@ public class Server implements Runnable {
 		String content = message.getContent().toLowerCase();
 		// String extra = message.getExtra();
 		String response = "";
-		LocalDate today = LocalDate.now();
-		DayOfWeek dayOfWeek = today.getDayOfWeek();
+		Menu menu = null;
+		Message messageR = null;
 
 		if (content.contains("menus")) {
 			response = this.getMenuNames();
 		} else if (content.contains("today") || content.contains("menu of the day")) {
-			response = this.getToday().getMenu();
+			menu = this.getToday();
+			response = menu.getMenu();
 		} else {
-			Menu menu = this.getMenu(content);
+		    menu = this.getMenu(content);
 
 			if (!Objects.isNull(menu)) {
 				response = menu.getMenu();
@@ -178,13 +181,23 @@ public class Server implements Runnable {
 				response = "Unknown command";
 			}
 		}
+		
+		messageR = new Message(response, this.ackNumber, this.seqNumber);
+		if (!Objects.isNull(menu)) {
+			messageR.addCache(menu);
+		}
 
-		return new Message(response, this.ackNumber, this.seqNumber);
+
+		return messageR;
 	}
 	
 	public Menu getToday() {
 		LocalDate today = LocalDate.now();
 		DayOfWeek dayOfWeek = today.getDayOfWeek();
+		
+		if (dayOfWeek.equals(DayOfWeek.SUNDAY) || dayOfWeek.equals(DayOfWeek.SATURDAY)) {
+			dayOfWeek = DayOfWeek.FRIDAY;
+		}
 		
 		return this.dayToMenu.get(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).toString());
 	}
