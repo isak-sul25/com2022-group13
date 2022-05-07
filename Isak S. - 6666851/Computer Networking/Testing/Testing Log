@@ -1,0 +1,200 @@
+Due to multithreading, the requests/responses might be printed out in an incorrect order.
+
+---------------------------------------------------------
+
+><><><><Test 3 & 4><><><><
+
+Decoded:
+1863792733,0:0;
+Hello World!
+
+Encoded:
+[49, 56, 54, 51, 55, 57, 50, 55, 51, 51, 44, 48, 58, 48, 59, 10, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33]
+
+---------------------------------------------------------
+
+><><><><Test 5 & 6><><><><
+
+Message:
+1863792733,0:0;
+Hello World!
+
+Checksum (applied on ',0:0;<extra>\n<message content>':
+1863792733
+
+---------------------------------------------------------
+
+><><><><Test 7 & 8><><><><
+
+Bad Message (throws an IllegalArgumentException when received by server/client)
+66666666,11:12;
+Hello World!
+
+---------------------------------------------------------
+
+><><><><Test 10 & 11><><><><
+
+
+Client sending:
+4192000089,0:0;
+MENUS
+
+Client receiving:
+2101433068,0:0;
+Chinese (Monday), Indian (Tuesday), Middle Eastern (Wednesday), Mediterranean (Thursday), American (Friday)
+
+Client sending:
+2209245427,0:1;
+MENU TODAY
+
+Client receiving:
+937275466,1:1;CA:friday,american;
+***American (Friday) Menu***
+Starter: Mini Burgers
+Main Dish: Buffalo Chicken
+Dessert: Apple Pie
+Drink: Soda
+
+---------------------------------------------------------
+
+><><><><Test 13 & 14><><><><
+
+
+Client sending:
+355421675,0:0;this is the extra field
+MENUS
+
+Client receiving:
+2101433068,0:0;
+Chinese (Monday), Indian (Tuesday), Middle Eastern (Wednesday), Mediterranean (Thursday), American (Friday)
+
+Server sending:
+107689257,0:0;this is the extra field
+Hello World!
+
+Client receiving:
+107689257,0:0;this is the extra field
+Hello World!
+
+---------------------------------------------------------
+
+><><><><Test 15 & 16><><><><
+
+An exception will be thrown when attempting to send a package larger than the specified limit.
+
+---------------------------------------------------------
+
+><><><><Test 2 & 12><><><><
+
+Server receiving:
+1354723991,0:0;
+MENU American
+
+Server responding:
+1929681414,0:0;CA:friday,american;
+***American (Friday) Menu***
+Starter: Mini Burgers
+Main Dish: Buffalo Chicken
+Dessert: Apple Pie
+Drink: Soda
+Request timed-out, retrying
+
+Client sending:
+1354723991,0:0;
+MENU American
+
+Client receiving:
+1929681414,0:0;CA:friday,american;
+***American (Friday) Menu***
+Starter: Mini Burgers
+Main Dish: Buffalo Chicken
+Dessert: Apple Pie
+Drink: Soda
+
+---------------------------------------------------------
+
+><><><><Test 17><><><><
+
+Expected pattern:
+C - 0:0
+S - 0:0
+
+C - 0:1
+S - 1:1
+
+C - 1:2
+S - 2:2
+
+C - 2:3
+S - 3:3
+
+Client sending:
+3948311287,0:0;
+Message 1
+
+Client receiving:
+600377965,0:0;
+Unknown command
+
+Client sending:
+3925503778,0:1;
+Message 2
+
+Client receiving:
+2851899338,1:1;
+Unknown command
+
+Client sending:
+1953262642,1:2;
+Message 3
+
+Client receiving:
+3973257058,2:2;
+Unknown command
+
+Client sending:
+231510053,2:3;
+Message 4
+
+Client receiving:
+1726388933,3:3;
+Unknown command
+
+---------------------------------------------------------
+
+><><><><Test 1><><><><
+
+Server port: 1400
+
+Client sending:
+1863792733,0:0;
+Hello World!
+
+Server receiving:
+1863792733,0:0;
+Hello World!
+
+---------------------------------------------------------
+
+><><><><Test 9><><><><
+
+Client sends requests, Server receives the requests without responding.
+
+Server receiving:
+1354723991,0:0;
+MENU American
+Request timed-out, retrying
+
+Server receiving:
+1354723991,0:0;
+MENU American
+Request timed-out, retrying
+
+Server receiving:
+1354723991,0:0;
+MENU American
+Request timed-out, retrying
+
+Client sending:
+1354723991,0:0;
+MENU American
