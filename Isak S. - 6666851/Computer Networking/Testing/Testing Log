@@ -48,35 +48,28 @@ Client sending:
 MENU TODAY
 
 Client receiving:
-1161273440,1:1;
-***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
+3913404403,1:1;CA:today,monday,chinese;
+***Chinese (Monday) Menu***: Starter: Sliced Tofu Salad / Main Dish: Kung Pao Chicken/  Dessert: Fried Bananas /Drink: Bubble Tea
 
 ---------------------------------------------------------
 
 ><><><><Test 13 & 14><><><><
 
-
-Client sending:
-2389243714,0;this is the extra field
-MENUS
-
-Client receiving:
-2101433068,0:0;
-Chinese (Monday), Indian (Tuesday), Middle Eastern (Wednesday), Mediterranean (Thursday), American (Friday)
-
-Server sending:
-107689257,0:0;this is the extra field
-Hello World!
-
-Client receiving:
-107689257,0:0;this is the extra field
-Hello World!
+An exception will be thrown when attempting to send a package larger than the specified limit.
 
 ---------------------------------------------------------
 
-><><><><Test 15 & 16><><><><
+><><><><Test 17 & 18><><><><
 
-An exception will be thrown when attempting to send a package larger than the specified limit.
+Handshake:
+1905810564,
+100
+
+Client receiving:
+1320470661,
+100:OK
+
+Server connected
 
 ---------------------------------------------------------
 
@@ -87,7 +80,7 @@ Server receiving:
 MENU American
 
 Server responding:
-2170881026,0:0;
+1792407414,0:0;CA:friday,american;
 ***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
 Request timed-out, retrying
 
@@ -96,57 +89,14 @@ Client sending:
 MENU American
 
 Client receiving:
-2170881026,0:0;
+1792407414,0:0;CA:friday,american;
 ***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
 
 ---------------------------------------------------------
 
-><><><><Test 17><><><><
+><><><><Test 16><><><><
 
-Expected pattern:
-C - 0
-S - 0:0
-
-C - 0:1
-S - 1:1
-
-C - 1:2
-S - 2:2
-
-C - 2:3
-S - 3:3
-
-Client sending:
-1106615643,0;
-Message 1
-
-Client receiving:
-600377965,0:0;
-Unknown command
-
-Client sending:
-3925503778,0:1;
-Message 2
-
-Client receiving:
-2851899338,1:1;
-Unknown command
-
-Client sending:
-1953262642,1:2;
-Message 3
-
-Client receiving:
-3973257058,2:2;
-Unknown command
-
-Client sending:
-231510053,2:3;
-Message 4
-
-Client receiving:
-1726388933,3:3;
-Unknown command
+Closing Client...
 
 ---------------------------------------------------------
 
@@ -186,3 +136,40 @@ Request timed-out, retrying
 Client sending:
 1184228971,0;
 MENU American
+
+---------------------------------------------------------
+
+><><><><Test Extra 1><><><><
+
+
+Client sending:
+2389243714,0;this is the extra field
+MENUS
+
+Client receiving:
+2101433068,0:0;
+Chinese (Monday), Indian (Tuesday), Middle Eastern (Wednesday), Mediterranean (Thursday), American (Friday)
+
+Server sending:
+107689257,0:0;this is the extra field
+Hello World!
+
+Client receiving:
+107689257,0:0;this is the extra field
+Hello World!
+
+---------------------------------------------------------
+
+><><><><Test Extra 2><><><><
+
+Running backup Server at: -1
+
+---------------------------------------------------------
+
+><><><><Test Extra 3><><><><
+
+Testing caching:
+
+***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
+***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
+*Cache Hit*
