@@ -70,13 +70,6 @@ public class Server implements Runnable {
 			this.backUp = bool;
 			System.out.println("Running backup Server at: " + this.dsBackUp.getPort());
 		} else if (this.backUp == true && bool == false) {
-			try {
-				thread.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("Could not close backup server");
-			}
 
 			this.dsBackUp.close();
 			System.out.println("Backup server is closed");
@@ -95,13 +88,12 @@ public class Server implements Runnable {
 
 		try {
 			ds.receive(packetR);
+			
 		} catch (Exception e) {
 			// Ignore when connection closed.
 			// System.out.println(e);
 			return;
 		}
-
-		// thread.start();
 
 		try {
 			messageR = new Message(buffer);
@@ -111,7 +103,7 @@ public class Server implements Runnable {
 		}
 
 		/////
-		System.out.println("Server receiving:\n" + messageR.toString());
+		//System.out.println("Server receiving:\n" + messageR.toString());
 
 		if (messageR.getSeqNumber() != -100) {
 			this.ackNumber = messageR.getSeqNumber();
@@ -131,7 +123,7 @@ public class Server implements Runnable {
 		}
 
 		/////
-		System.out.println("\nServer sending:\n" + messageS.toString() + "\n");
+		//System.out.println("\nServer sending:\n" + messageS.toString() + "\n");
 
 	}
 
@@ -295,4 +287,53 @@ public class Server implements Runnable {
 		ds.close();
 	}
 
+	public void runBackup( ) {
+		this.useBackUp(true);
+		
+		DatagramPacket packetR = null;
+		Message messageR = null;
+		Message messageS = null;
+		byte[] buffer = new byte[65535];
+
+		packetR = new DatagramPacket(buffer, buffer.length);
+
+		try {
+			this.dsBackUp.receive(packetR);
+			
+		} catch (Exception e) {
+			// Ignore when connection closed.
+			// System.out.println(e);
+			return;
+		}
+
+		try {
+			messageR = new Message(buffer);
+		} catch (Exception e) {
+			System.out.println(e);
+			return;
+		}
+
+		/////
+		System.out.println("Server receiving:\n" + messageR.toString());
+
+		if (messageR.getSeqNumber() != -100) {
+			this.ackNumber = messageR.getSeqNumber();
+		} else if (messageR.getAckNumber() == -100 && messageR.getContent().contains("OK")) {
+			
+			return;
+		}
+
+		messageS = this.receiveResponse(messageR);
+
+		try {
+			this.send(messageS, packetR.getSocketAddress());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+
+		/////
+		System.out.println("\nServer sending:\n" + messageS.toString() + "\n");
+	}
 }

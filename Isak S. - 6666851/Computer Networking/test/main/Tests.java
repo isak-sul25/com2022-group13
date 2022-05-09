@@ -229,10 +229,10 @@ class Tests {
 
 	}
 
-	// Test 13 & 14 - client/server sends a message with a non-empty <extra> field.
+	// Test Extra 1 - client/server sends a message with a non-empty <extra> field.
 	@Test
-	void test13_14() throws IOException {
-		System.out.println("><><><><Test 13 & 14><><><><\n");
+	void test_extra_1() throws IOException {
+		System.out.println("><><><><Test Extra 1><><><><\n");
 		Message message = new Message(testString, 0, 0);
 		message.setExtra("this is the extra field");
 
@@ -263,41 +263,34 @@ class Tests {
 		server.testSend(message, client.getAddress());
 	}
 
-	// Test 15 & 16 - client/server attempts to send a message with a size larger
+	// Test 13 & 14 - client/server attempts to send a message with a size larger
 	// than the specified limit - the package is not sent. This is
 	// implemented in the Message class and this test is meant to verify it's
 	// validity.
 	@Test
-	void test15_16() throws IOException {
-		System.out.println("><><><><Test 15 & 16><><><><\n");
-		
-		System.out.println("An exception will be thrown when attempting to send a package larger than the specified limit.");
-		
-	    byte[] array = new byte[577];
-	    new Random().nextBytes(array);
-	    String longString = new String(array, Message.charset);
-	    
+	void test13_14() throws IOException {
+		System.out.println("><><><><Test 13 & 14><><><><\n");
+
+		System.out.println(
+				"An exception will be thrown when attempting to send a package larger than the specified limit.");
+
+		byte[] array = new byte[577];
+		new Random().nextBytes(array);
+		String longString = new String(array, Message.charset);
+
 		assertThrows(IllegalArgumentException.class, () -> {
 			Message message = new Message(longString, 0, 0);
 		});
-		
-	}
 
-	// Test 17 - client requests the list of all menus and today's menu.
+	}
+	
+	// Test Extra 3- testing cache.
 	@Test
-	void test17() throws IOException {
-		System.out.println("><><><><Test 17><><><><\n");
-		
-		System.out.println("Expected pattern:\n"
-				+ "C - 0\n"
-				+ "S - 0:0\n\n"
-				+ "C - 0:1\n"
-				+ "S - 1:1\n\n"
-				+ "C - 1:2\n"
-				+ "S - 2:2\n\n"
-				+ "C - 2:3\n"
-				+ "S - 3:3");
-		
+	void test_extra_3() throws IOException {
+		System.out.println("><><><><Test Extra 3><><><><\n");
+
+		System.out.println("Testing caching:\n");
+
 		thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -306,11 +299,65 @@ class Tests {
 		});
 		thread.start();
 
-		client.test("Message 1");
-		client.test("Message 2");
-		client.test("Message 3");
-		client.test("Message 4");
-		
-		
+		System.out.println(client.sendAndReceive("AMERICAN").getContent());
+		System.out.println(client.sendAndReceive("AMERICAN").getContent());
 	}
+	
+	// Test 16 - The Client user input equals "EXIT" - socket closes the Client is terminated.
+	@Test
+	void test16() throws IOException {
+		System.out.println("><><><><Test 16><><><><\n");
+
+		client.test("EXIT");
+
+	}
+	
+	// Test 17 & 18 - 3-way handshake.
+	@Test
+	void test17_18() throws IOException {
+		System.out.println("><><><><Test 17 & 18><><><><\n");
+		
+		thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				server.run();
+			}
+		});
+		thread.start();
+		
+		try {
+			client.handshake();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	// Test Extra 2 - backup port.
+	@Test
+	void test_extra_2() throws IOException {
+		System.out.println("><><><><Test Extra 2><><><><\n");
+		
+		thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				server.run();
+			}
+		});
+		thread.start();
+		
+		thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				server.runBackup();
+			}
+		});
+		thread.start();
+		
+	
+		server.useBackUp(false);;
+	}
+	
+	
+	
 }

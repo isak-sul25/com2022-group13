@@ -1,15 +1,16 @@
 import random
-from socket import *
 import select
 import datetime
 import zlib
 import time
 import threading
 import collections
+import socket
 
-serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind(('127.0.0.1', 1400))
-address = ('127.0.0.1', 1400)
+serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+serverSocket.bind(('127.0.0.1', 1300))
+address = ('127.0.0.1', 1300)
+socket.setdefaulttimeout(5)
 
 
 syn_ack = '100'
@@ -56,12 +57,12 @@ else:
     print('checksum doesnt match')
     #timeout resend 
 
-
 print("SERVER CONNECTED")
 
 
 
 #variables:
+timeout_count = 0
 seqCount = 0
 client_count = 0
 checksum_b = False
@@ -69,13 +70,13 @@ acknow_for_c = 0
 input = ''
 american_menu = 'Starter: Mini Burgers / Main: Buffalo Chicken / Dessert: Apple Pie / Drink: Coca-Cola'
 french_menu = 'Starter: Crossiant / Main: Bœuf bourguignon / Dessert: Cake / Drink: Fanta'
-medi_menu = 'Starter: Baba Ganoush, Main: Spanakopita, Dessert: "Baklava", Drink: Iced Tea'
+medi_menu = 'Starter: Baba Ganoush / Main: Spanakopita / Dessert: "Baklava" / Drink: Iced Tea'
 command_menu_today = "TODAY"
 command_menus = "MENUS"
 command_menu_american = "AMERICAN"
 command_menu_medi = "MEDITERRANEAN"
 command_menu_french = "FRENCH"
-error_input = "INPUT NOT UNDERSTOOD, INPUT MUST INCLUDE ONE OF THE FOLLOWING COMMANDS:" + command_menu_american + ' ' + command_menu_medi + ' ' +  command_menu_french
+error_input = "INPUT NOT UNDERSTOOD / INPUT MUST INCLUDE ONE OF THE FOLLOWING COMMANDS:" + command_menu_american + ' ' + command_menu_medi + ' ' +  command_menu_french
 dayOfTheWeek = datetime.datetime.today().weekday()
 message1 = ''
 
@@ -84,10 +85,11 @@ client_count = 0
 acknowledgment_for_client = ''
 
 
-while True:
+while (timeout_count<5):
     try:
         data, address = serverSocket.recvfrom(1024)
         data = data.decode('utf-8')
+        timeout_count = 0
         checksum = data.split(',')[0]
         packetclient = data.splitlines()
 
@@ -147,7 +149,7 @@ while True:
                     message1 = 'Sunday Menu: Starter: Spring Rolls / Main: Pasta / Dessert: Cake / Drink: Lipton Ice Tea' 
 
             elif command_menus in words:
-                message1 = 'ALL MENUS ARE THE FOLLOWING: MENU TODAY, MENU MEDITERRANEAN, MENU FRENCH, AND MENU AMERICAN. PLEASE SPECIFY ACCORDINGLY'
+                message1 = 'ALL MENUS ARE THE FOLLOWING: MENU TODAY / MENU MEDITERRANEAN / MENU FRENCH AND MENU AMERICAN / PLEASE SPECIFY ACCORDINGLY'
                 
             elif command_menu_american in words:
                 message1 = american_menu
@@ -173,13 +175,17 @@ while True:
             packet_to_c = packet_format.encode('utf-8') 
             checksum_value = zlib.crc32(packet_to_c)
             packet_to_client = str(checksum_value) + packet_format
-            serverSocket.sendto(packet_to_client.encode('utf-8'), address)
-            client_count = client_count + 1
-            seqCount = seqCount + 1
-            print('REQUEST SENT')
-            print(packet_to_client)
+            final_packet_to_send = packet_to_client.encode('utf-8')
+        if(len(final_packet_to_send)>576):
+                print('PACKET TOO LARGE')
+        else:
+                serverSocket.sendto(final_packet_to_send, address)
+                client_count = client_count + 1
+                seqCount = seqCount + 1
+                print('REQUEST SENT')
+                print(packet_to_client)
                 
             
     except socket.timeout as inst:
         print('REQUEST TIMING OUT, RETRANSMISSION OCCURRING')
-    
+        timeout_count = timeout_count + 1

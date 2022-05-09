@@ -83,8 +83,7 @@ public class RunServer {
 		Thread thread = new Thread(server);
 	    thread.start();
 	    
-	    server.useBackUp(true);
-	    server.useBackUp(false);
+	    server.runBackup();
 	    
 	    
 	    

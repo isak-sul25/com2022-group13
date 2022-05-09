@@ -7,15 +7,21 @@ import collections
 import zlib
 
 UDP_IP_ADDRESS = "127.0.0.1"
-UDP_PORT_NO = 1400
-address = ("127.0.0.1",1400)
-socket.setdefaulttimeout(10)
+UDP_PORT_NO = 1300
+address = ("127.0.0.1",1300)
+socket.setdefaulttimeout(5)
 clientSocket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+
 
 
 
 syn_client = '100'
 ack_server = 'OK'
+cache_list = []
+cache_1 = ''
+state_cache = False
 
 syn_packet_form1 = ',' + '\n' + syn_client
 checksum_syn_packet = zlib.crc32(syn_packet_form1.encode('utf-8'))
@@ -42,6 +48,7 @@ if(checksum_synack1 == checksum_from_server_syn):
     checksum_ack_s1 = str(checksum_ack_s)
     ack_to_client_twh = checksum_ack_s1 + ',' + '\n' + 'OK'
     ack_packet_twh = ack_to_client_twh.encode('utf-8')
+    rtt_time=time.time() *1000
     ack_twh = clientSocket.sendto(ack_packet_twh,address)
     print('ACKNOWLEDGMENT FROM CLIENT CONNECTION ESTABLISHED')
 
@@ -56,11 +63,15 @@ print("CLIENT CONNECTED")
 
 
 seqNum = 0 
+rreturn = ''
 ack_for_s = ''
 messageToServer = ''
 print("ENTER MENUS TO VIEW ALL AVAILABLE MENUS:" + '\n' + "ENTER TODAY TO VIEW THE MENU OF THE DAY:" + '\n' + "ENTER MENU <MENU NAME> TO VIEW MENU <NAME>:" + '\n' + "ENTER EXIT TO QUIT USER INPUT:")
 while messageToServer!='EXIT': 
     try:
+
+
+
         rand = random.randint(0, 10)
         start = time.time()* 1000
         messageToServer = input("PLEASE REQUEST A MENU: ")
@@ -69,6 +80,16 @@ while messageToServer!='EXIT':
             print('GOODBYE')
             clientSocket.close()
             break
+
+        for x in cache_list:
+            response1 = x.split(',')[0]
+            if response1 == messageToServer:
+                rreturn = x.split(',')[1]
+                print('MENU PREVIOUSLY REQUESTED')
+                print(rreturn)
+                cache_1 = 'COMPLETE'
+        if(cache_1 == 'COMPLETE'):
+            continue
 
 
         if rand < 2:
@@ -85,7 +106,11 @@ while messageToServer!='EXIT':
             checksum_value = zlib.crc32(packet_to_s)
             packet_to_server = str(checksum_value) + ',' + optional + ';' + '\n' + messageToServer
             packet_to_server1 = packet_to_server.encode('utf-8') 
-            sent = clientSocket.sendto(packet_to_server1,address)
+            if(len(packet_to_server1)>576):
+                print('PACKET TOO LARGE')
+            else:
+                sent = clientSocket.sendto(packet_to_server1,address)
+            
 
 
         data, server = clientSocket.recvfrom(1024)
@@ -111,7 +136,9 @@ while messageToServer!='EXIT':
             print('Acknowledgment from server for packet number: ' + str(ack_from_server))
             print("The menu is as follows:")
             print(payload)
-            seqNum  = seqNum + 1                              
+            print ('RECEIVED after {} ms'.format((time.time() *1000)-rtt_time))
+            seqNum  = seqNum + 1  
+            cache_list.append(messageToServer + ',' + payload)                            
         else:
             print('CHECKSUM DOES NOT MATCH, CORRUPTED PACKET RECEIVED')
 

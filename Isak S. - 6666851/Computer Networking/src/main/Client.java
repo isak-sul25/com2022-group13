@@ -116,7 +116,7 @@ public class Client implements Runnable {
 
 		if (!this.cache.isEmpty()) {
 			for (Entry<String, String> entry : this.cache.entrySet()) {
-				if (input.contains(entry.getKey())) {
+				if (input.toLowerCase().contains(entry.getKey())) {
 					return new Message(entry.getValue() + "\n*Cache Hit*", 0, 0);
 				}
 			}

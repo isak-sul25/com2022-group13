@@ -163,8 +163,8 @@ public class Message {
 	}
 
 	public String getExtra() {
-		// return this.getCache() + this.extra;
-		return this.extra;
+		return this.getCache() + this.extra;
+		//return this.extra;
 	}
 
 	public void setExtra(String extra) {
