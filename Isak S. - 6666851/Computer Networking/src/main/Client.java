@@ -308,6 +308,9 @@ public class Client implements Runnable {
 		this.send(new Message("OK", -100, -100));
 		System.out.println("\nServer connected");
 		
+		
+		this.seqNumber = 0;
+		this.ackNumber = -1;
 	}
 
 }

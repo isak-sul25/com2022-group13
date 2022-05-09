@@ -57,6 +57,11 @@ public class client {
 
 			// convert the String input into the byte array.
 			buf = inp.getBytes();
+			
+			if (buf.length > 756) {
+				System.out.println("Input is too large");
+				continue;
+			}
 
 			CRC32 crc = new CRC32();
 
@@ -72,7 +77,9 @@ public class client {
 
 			Charset charset = Charset.availableCharsets().get("UTF-8");
 
+			
 			String str = crc.getValue() + forCheck;
+			
 			buf = str.getBytes(charset);
 
 			DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, 1400);

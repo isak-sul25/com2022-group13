@@ -84,6 +84,8 @@ public class server {
 				response = Pakistan.toString();
 			} else if (content.contains("moroccan")) {
 				response = Moroccan.toString();
+			} else if (content.contains("bigtext")) {
+				response = "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.";
 			}
 
 			else {
@@ -93,9 +95,16 @@ public class server {
 			CRC32 crc2 = new CRC32();
 			String forCheck = "," + ack + ":" + seq + ";\n" + response;
 			crc2.update(forCheck.getBytes());
+			
 			String str =  crc2.getValue() + forCheck;
-
+			
+			
 			byte[] buf = str.getBytes(charset);
+			
+			if (buf.length > 754) {
+				System.out.println("Input is too large");
+				continue;
+			}
 
 			DatagramPacket Dpresponse = new DatagramPacket(buf, buf.length, DpReceive.getSocketAddress());
 			ds.send(Dpresponse);

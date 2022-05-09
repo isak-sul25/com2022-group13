@@ -6,23 +6,26 @@ import main.Client;
 
 public class CClient {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		Client c = new Client();
 		try {
 			// sends and receives a message
-			c.test("");
+			c.handshake();
+			//c.test("");
 			
 			// 10& 1 & 17
-			c.test("MENUS");
+			//c.test("MENUS");
 			
 			//11
-			c.test("MENU TODAY");
+			//c.test("MENU TODAY");
 			
 			//12
-			c.test("MENU AMERICAN");
+			//c.test("MENU AMERICAN");
 			
 			//c.run();
+			
+			c.run();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
