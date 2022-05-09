@@ -15,7 +15,7 @@ public class Client implements Runnable {
 
 	private DatagramSocket ds = null;
 	private int seqNumber = 0;
-	private int ackNumber = 0;
+	private int ackNumber = -1;
 
 	private HashMap<String, String> cache = null;
 
@@ -43,6 +43,13 @@ public class Client implements Runnable {
 
 		while (true) {
 			String input = scanner.nextLine();
+
+			if (input.equals("EXIT")) {
+				System.out.println("Closing Client...");
+				ds.close();
+				break;
+			}
+
 			String output = null;
 			try {
 				output = this.sendAndReceive(input).getContent();
@@ -61,9 +68,17 @@ public class Client implements Runnable {
 	public String test(String message) throws IOException {
 		int a = this.ackNumber;
 		int s = this.seqNumber;
+
+		if (message == "EXIT") {
+			System.out.println("Closing Client...");
+			ds.close();
+			return null;
+		}
+
 		Message response = this.sendAndReceive(message);
-		/////////////////////////////
-		System.out.println("\nClient sending:\n" + new Message(message, a, s).toString());
+		Message test = new Message(message, a, s);
+
+		System.out.println("\nClient sending:\n" + test.toString());
 
 		if (Objects.isNull(response)) {
 			return null;
@@ -95,6 +110,9 @@ public class Client implements Runnable {
 		Message messageR = null;
 		byte[] buffer = null;
 		DatagramPacket packetR = null;
+
+		/////////////////////////////
+		// System.out.println("\nClient sending:\n" + messageS.toString());
 
 		if (!this.cache.isEmpty()) {
 			for (Entry<String, String> entry : this.cache.entrySet()) {
@@ -135,7 +153,7 @@ public class Client implements Runnable {
 		}
 
 		this.ackNumber = messageR.getSeqNumber();
-		
+
 		if (!Objects.isNull(messageR.getCacheMap())) {
 			this.cache.putAll(messageR.getCacheMap());
 		}
@@ -221,11 +239,11 @@ public class Client implements Runnable {
 		System.out.println("\nClient receiving:\n" + new String(message.toString()));
 
 		this.ackNumber = message.getSeqNumber();
-		
+
 		if (!Objects.isNull(message.getCacheMap())) {
 			this.cache.putAll(message.getCacheMap());
 		}
-		
+
 		return message;
 	}
 
@@ -268,6 +286,28 @@ public class Client implements Runnable {
 
 	public SocketAddress getAddress() {
 		return this.ds.getLocalSocketAddress();
+	}
+
+	public void handshake() throws Exception {
+		Message hs = new Message("100", -100, -100);
+
+		try {
+			this.send(hs);
+			System.out.println("Handshake:\n" + hs.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Message ok = this.testReceive(1000);
+		
+		if (Objects.isNull(ok) || !ok.getContent().equals("100:OK")) {
+			throw new Exception("Handshake unsuccessful");
+		}
+
+		this.send(new Message("OK", -100, -100));
+		System.out.println("\nServer connected");
+		
 	}
 
 }

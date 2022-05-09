@@ -18,6 +18,7 @@ public class udpBaseClient_2
 		DatagramSocket ds = new DatagramSocket();
 
 		InetAddress ip = InetAddress.getLocalHost();
+		System.out.println(ip);
 		byte buf[] = null;
 
 		// loop while user not enters "bye"
@@ -31,7 +32,7 @@ public class udpBaseClient_2
 			// Step 2 : Create the datagramPacket for sending
 			// the data.
 			DatagramPacket DpSend =
-				new DatagramPacket(buf, buf.length, ip, 1234);
+				new DatagramPacket(buf, buf.length, ip, 1400);
 
 			// Step 3 : invoke the send call to actually send
 			// the data.

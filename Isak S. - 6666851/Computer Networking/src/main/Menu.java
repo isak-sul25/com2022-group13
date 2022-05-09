@@ -19,10 +19,10 @@ public class Menu {
 	}
 	
 	public String getMenu() {
-		String output = "***" + this.getName() + " Menu***\n" +
-						"Starter: " + this.starter + "\n" +
-						"Main Dish: " + this.mainDish + "\n" +
-						"Dessert: " + this.dessert + "\n" +
+		String output = "***" + this.getName() + " Menu***: " +
+						"Starter: " + this.starter + " / " +
+						"Main Dish: " + this.mainDish + "/  " +
+						"Dessert: " + this.dessert + " /" +
 						"Drink: " + this.drink;
 		
 		return output;

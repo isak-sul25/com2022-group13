@@ -21,6 +21,10 @@ public class Server implements Runnable {
 	private HashMap<String, Menu> themeToMenu = null;
 	private HashMap<String, Menu> dayToMenu = null;
 
+	private DatagramSocket dsBackUp = null;
+	private boolean backUp = false;
+	private Thread thread = new Thread();
+
 	private int seqNumber = 0;
 	private int ackNumber = 0;
 
@@ -51,6 +55,36 @@ public class Server implements Runnable {
 		}
 	}
 
+	public void useBackUp(boolean bool) {
+
+		if (this.backUp == false && bool == true) {
+
+			try {
+				this.dsBackUp = new DatagramSocket();
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("Could not start backup Server");
+				return;
+			}
+			this.backUp = bool;
+			System.out.println("Running backup Server at: " + this.dsBackUp.getPort());
+		} else if (this.backUp == true && bool == false) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("Could not close backup server");
+			}
+
+			this.dsBackUp.close();
+			System.out.println("Backup server is closed");
+		}
+
+		this.backUp = bool;
+	}
+
 	public void runOnce() {
 		DatagramPacket packetR = null;
 		Message messageR = null;
@@ -67,17 +101,24 @@ public class Server implements Runnable {
 			return;
 		}
 
+		// thread.start();
+
 		try {
 			messageR = new Message(buffer);
 		} catch (Exception e) {
 			System.out.println(e);
 			return;
 		}
-		
+
 		/////
-		//System.out.println(messageR.toString());
-	
-		this.ackNumber = messageR.getSeqNumber();
+		System.out.println("Server receiving:\n" + messageR.toString());
+
+		if (messageR.getSeqNumber() != -100) {
+			this.ackNumber = messageR.getSeqNumber();
+		} else if (messageR.getAckNumber() == -100 && messageR.getContent().contains("OK")) {
+			
+			return;
+		}
 
 		messageS = this.receiveResponse(messageR);
 
@@ -88,7 +129,10 @@ public class Server implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		
+
+		/////
+		System.out.println("\nServer sending:\n" + messageS.toString() + "\n");
+
 	}
 
 	public void send(Message message, SocketAddress address) throws IOException {
@@ -102,14 +146,16 @@ public class Server implements Runnable {
 			System.out.println(e);
 			return;
 		}
-		this.seqNumber = this.seqNumber + 1;
+		
+		if (message.getAckNumber() != -100) {
+			this.seqNumber = this.seqNumber + 1;
+		}
 	}
-	
+
 	public void testSend(Message message, SocketAddress address) throws IOException {
 		this.send(message, address);
 		System.out.println("\nServer sending:\n" + message.toString());
 	}
-
 
 	public Message receive() {
 
@@ -172,8 +218,10 @@ public class Server implements Runnable {
 		} else if (content.contains("today") || content.contains("menu of the day")) {
 			menu = this.getToday();
 			response = menu.getMenu();
+		} else if (content.contains("100")) {
+			return new Message("100:OK", -100, -100);
 		} else {
-		    menu = this.getMenu(content);
+			menu = this.getMenu(content);
 
 			if (!Objects.isNull(menu)) {
 				response = menu.getMenu();
@@ -181,24 +229,23 @@ public class Server implements Runnable {
 				response = "Unknown command";
 			}
 		}
-		
+
 		messageR = new Message(response, this.ackNumber, this.seqNumber);
 		if (!Objects.isNull(menu)) {
 			messageR.addCache(menu);
 		}
 
-
 		return messageR;
 	}
-	
+
 	public Menu getToday() {
 		LocalDate today = LocalDate.now();
 		DayOfWeek dayOfWeek = today.getDayOfWeek();
-		
+
 		if (dayOfWeek.equals(DayOfWeek.SUNDAY) || dayOfWeek.equals(DayOfWeek.SATURDAY)) {
 			dayOfWeek = DayOfWeek.FRIDAY;
 		}
-		
+
 		return this.dayToMenu.get(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).toString());
 	}
 

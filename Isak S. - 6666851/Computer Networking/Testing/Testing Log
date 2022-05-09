@@ -36,7 +36,7 @@ Hello World!
 
 
 Client sending:
-4192000089,0:0;
+1342036424,0;
 MENUS
 
 Client receiving:
@@ -48,12 +48,8 @@ Client sending:
 MENU TODAY
 
 Client receiving:
-937275466,1:1;CA:friday,american;
-***American (Friday) Menu***
-Starter: Mini Burgers
-Main Dish: Buffalo Chicken
-Dessert: Apple Pie
-Drink: Soda
+1161273440,1:1;
+***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
 
 ---------------------------------------------------------
 
@@ -61,7 +57,7 @@ Drink: Soda
 
 
 Client sending:
-355421675,0:0;this is the extra field
+2389243714,0;this is the extra field
 MENUS
 
 Client receiving:
@@ -87,36 +83,28 @@ An exception will be thrown when attempting to send a package larger than the sp
 ><><><><Test 2 & 12><><><><
 
 Server receiving:
-1354723991,0:0;
+1184228971,0;
 MENU American
 
 Server responding:
-1929681414,0:0;CA:friday,american;
-***American (Friday) Menu***
-Starter: Mini Burgers
-Main Dish: Buffalo Chicken
-Dessert: Apple Pie
-Drink: Soda
+2170881026,0:0;
+***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
 Request timed-out, retrying
 
 Client sending:
-1354723991,0:0;
+1184228971,0;
 MENU American
 
 Client receiving:
-1929681414,0:0;CA:friday,american;
-***American (Friday) Menu***
-Starter: Mini Burgers
-Main Dish: Buffalo Chicken
-Dessert: Apple Pie
-Drink: Soda
+2170881026,0:0;
+***American (Friday) Menu***: Starter: Mini Burgers / Main Dish: Buffalo Chicken/  Dessert: Apple Pie /Drink: Soda
 
 ---------------------------------------------------------
 
 ><><><><Test 17><><><><
 
 Expected pattern:
-C - 0:0
+C - 0
 S - 0:0
 
 C - 0:1
@@ -129,7 +117,7 @@ C - 2:3
 S - 3:3
 
 Client sending:
-3948311287,0:0;
+1106615643,0;
 Message 1
 
 Client receiving:
@@ -167,11 +155,11 @@ Unknown command
 Server port: 1400
 
 Client sending:
-1863792733,0:0;
+692879746,0;
 Hello World!
 
 Server receiving:
-1863792733,0:0;
+692879746,0;
 Hello World!
 
 ---------------------------------------------------------
@@ -181,20 +169,20 @@ Hello World!
 Client sends requests, Server receives the requests without responding.
 
 Server receiving:
-1354723991,0:0;
+1184228971,0;
 MENU American
 Request timed-out, retrying
 
 Server receiving:
-1354723991,0:0;
+1184228971,0;
 MENU American
 Request timed-out, retrying
 
 Server receiving:
-1354723991,0:0;
+1184228971,0;
 MENU American
 Request timed-out, retrying
 
 Client sending:
-1354723991,0:0;
+1184228971,0;
 MENU American

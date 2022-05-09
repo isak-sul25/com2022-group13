@@ -83,11 +83,16 @@ public class RunServer {
 		Thread thread = new Thread(server);
 	    thread.start();
 	    
-		Client client = new Client();
-	    Thread thread2 = new Thread(client);
+	    server.useBackUp(true);
+	    server.useBackUp(false);
+	    
+	    
+	    
+		//Client client = new Client();
+	    //Thread thread2 = new Thread(client);
 	    //thread2.start();	
-		client.test("american");
-		client.test("american");
+		//client.test("american");
+		//client.test("american");
 	    //Message mes = new Message("Hello World!", 0, 0);
 		//System.out.println(mes.toString());
 		

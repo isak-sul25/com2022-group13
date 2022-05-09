@@ -289,7 +289,7 @@ class Tests {
 		System.out.println("><><><><Test 17><><><><\n");
 		
 		System.out.println("Expected pattern:\n"
-				+ "C - 0:0\n"
+				+ "C - 0\n"
 				+ "S - 0:0\n\n"
 				+ "C - 0:1\n"
 				+ "S - 1:1\n\n"
